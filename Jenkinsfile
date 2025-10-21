@@ -44,5 +44,19 @@ pipeline {
                 }
             }
         }
+        stage('Deploy to EC2') {
+			steps {
+				sshagent(['ec2-ssh-key']) {
+					sh """
+					ssh -o StrictHostKeyChecking=no ubuntu@43.204.22.237 '
+                    docker pull dhanushgubba/cart-service:latest &&
+                    docker stop cart-service || true &&
+                    docker rm cart-service || true &&
+                    docker run -d -p 8085:8085 --name cart-service dhanushgubba/cart-service:latest
+                	'
+           		 	"""
+        		}
+    		}
+		}
     }
 }
